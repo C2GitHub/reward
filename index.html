@@ -11,6 +11,7 @@
         body, html {
             width: 100%;
             height: 100%;
+            overflow: hidden;
         }
         .result {
             position: absolute;
@@ -24,7 +25,6 @@
         }
         .result span.first {
             display: inline-block;
-
             width: 400px;
             height: 200px;
             background: url("./img/bg-selected.png") center;
@@ -38,9 +38,6 @@
             font-size: 30px;
             line-height: 40px;
             color: #000;
-        }
-        .result span p {
-
         }
         button, input, optgroup, select, textarea {
             color: inherit;
@@ -118,17 +115,48 @@
         }
         .tools {
             position: absolute;
+            width: 100%;
             bottom: 20px;
-            right: 20px;
+            left: 10px;
+            height: 40px;
             text-align: center;
+            padding-right: 80px;
         }
         .tools .pure-button {
+            float: left;
             display: inline-block;
-            margin: 5px;
-            padding: 10px 0;
+            margin: 4px;
+            padding: 6px 0;
+            line-height: 22px;
             text-align: center;
-            width:50px;
+            width:40px;
         }
+        .tools .pure-button:nth-child(7), .tools .pure-button:nth-child(8) {
+            /*float: right;*/
+            position: absolute;
+            top: -5px;
+            font-size: 26px;
+            padding: 10px;
+            line-height: 28px;
+            margin-bottom: 16px;
+            color: #ffae00;
+        }
+        .tools .pure-button:nth-child(7) {
+            width: 80px;
+            right: 100px;
+        }
+        .tools .pure-button:nth-child(8) {
+           /* float: right;*/
+            right: 180px;
+            width: 79px;
+            margin-right: 40px;
+            background-image: url(./img/btn-l.png);
+            background-position: center center;
+            background-repeat: no-repeat;
+            -webkit-background-size: contain;
+            background-size: contain;
+        }
+
         .mask {
             -webkit-filter:blur(5px);
         }
@@ -179,7 +207,7 @@
             background-size: contain;
             background-position: center center;
             background-repeat: no-repeat;
-            transition: all .2s; display: ;
+            transition: all .2s;
         }
         #mask .reward-btn:hover {
             -webkit-transform: translateY(-2px) translateX(1px);
@@ -187,6 +215,17 @@
             -ms-transform: translateY(-2px) translateX(1px);
             -o-transform: translateY(-2px) translateX(1px);
             transform: translateY(-2px) translateX(1px);
+        }
+        .running {
+            background-color: rgba(0, 0, 0, .2);
+        }
+        .stop {
+            background-color: rgba(0, 0, 0, .4);
+        }
+        .button-pure {
+            border: 1px solid rgba(0, 0, 0, .2);
+            background-color: transparent;
+            color: #fff;
         }
     </style>
 </head>
@@ -202,14 +241,14 @@
         class="pure-button"
         v-class="button-error: selected == $value"
         v-repeat="btns">{{$value}}</button>
+    <button class="pure-button button-pure" v-on="click: reset">重置</button>
     <button
         class="pure-button"
         v-on="click: toggle"
         v-class="
-                button-secondary: !running,
-                button-success: running
+                running: !running,
+                stop: running
             ">{{running?'停!':'开始'}}</button>
-    <button class="pure-button button-warning" v-on="click: reset">重置</button>
 </div>
 <div id="fullpage" closed="0">
     <img src="./img/icon-fullpage.png" alt="">
@@ -233,7 +272,9 @@
 
     // 点击抽奖隐藏背景
     $('.reward-btn').on('click', function () {
-      $('#mask').animate().css('display', 'none');
+      $('#mask').animate({opacity: 0}, 1000, function () {
+        $('#mask').css('display', 'none');
+      })
     })
 </script>
 <script type="text/javascript">
@@ -271,7 +312,7 @@
                     }
                 } while(choosed[key]);
                 choosed[key] = 1;
-                ret.push('<span>' + member[id].depart + '<br/>' + member[id].name + '</span>>');
+                ret.push('<span class="first"><span>' + member[id].depart + '<br/>' + member[id].name + '</span></span>');
                 list[id].style.color = color;
             }
             localStorage.setItem('choosed', JSON.stringify(choosed));
@@ -288,7 +329,7 @@
                 selected: 1,
                 running: false,
                 btns: [
-                    1, 2, 3, 5, 10
+                    1, 2, 3, 4, 5, 6
                 ]
             },
             ready: function(){
@@ -317,7 +358,7 @@
                     if(this.running){
                         TagCanvas.SetSpeed('myCanvas', speed());
                         var ret = lottery(this.selected);
-                        $('#result').css('display', 'block').html('<span class="first">' + ret.join('</span><span>') + '</span>');
+                        $('#result').css('display', 'block').html('<span>' + ret.join('</span><span>') + '</span>');
                         TagCanvas.Reload('myCanvas');
                         setTimeout(function(){
                             localStorage.setItem(new Date().toString(), JSON.stringify(ret));
